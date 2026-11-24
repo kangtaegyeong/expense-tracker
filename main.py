@@ -1,60 +1,87 @@
-import csv #지출 항목을 csv파일로 저장
+from file_manager import create_file, select_file, load_expenses, save_expenses
+# file_manager 파일 안에 있는 create_file() 함수를 가져와 main.py에서 사용한다는 의미
+# 즉 파일끼리 연결되는 구조 생성 완료 
+from expense_manager import add_expenses, show_expenses, show_total
 
-print("Expense-Tracker")
 
-expenses = [] #while문 안으로 들어갈 경우 메뉴를 한 번 선택할 때마다 빈리스트로 초기화 시킴, 즉 2번 출력 안 됨
+def manage_expenses(filepath, expenses):
+    modified = False
+
+    while True:
+        print("\n ===== 지출 관리 ===== ")
+        print("1. 지출 추가")
+        print("2. 지출 목록 보기")
+        print("3. 총 지출 보기")
+        print("4. 저장")
+        print("5. 이전 메뉴")
+
+        sub_menu = int(input("메뉴를 선택하세요: "))
+
+        if sub_menu == 1:
+            expenses = add_expenses(expenses)
+
+        elif sub_menu == 2:
+            show_expenses(expenses)
+
+        elif sub_menu == 3:
+            show_total(expenses)
+
+        elif sub_menu == 4:
+            save_expenses(filepath, expenses)
+            modified = False
+            print("저장되었습니다.")
+
+        elif sub_menu == 5:
+            if modified:
+                print('\n저장되지 않은 변경사항이 있습니다.')
+                print('1. 저장 후 나가기')
+                print('2. 저장하지 않고 나가기')
+                print('3. 취소')
+
+                choice = input('선택하세요:')
+
+                if choice == '1':
+                    save_expenses(filepath, expenses)
+                    break
+                elif choice == '2':
+                    break
+                elif choice == '3':
+                    continue
+                    #반복문의 처음으로 돌아감
+                else:
+                    print('1부터 3 중에서 선택해주세요.')
+            else:    
+                break
+        else:
+            print("1부터 5 중에서 선택해주세요.")
+
 
 while True:
-    print("=====메뉴=====")
-    print("1. 지출 추가")
-    print("2. 지출 목록 보기")
-    print("3. 총 지출 보기")
-    print("4. 종료")
+    print("\n ===== Expense Tracker ===== ")
+    print("1. 기존 목록 불러오기")
+    print("2. 새 목록 만들기")
+    print("3. 종료 ")
 
-    menu = int(input('메뉴를 입력하세요: '))
+    menu = input("메뉴를 선택하세요: ")
 
-    if menu == 1:
-        while True:
-            name = input('지출 내역을 입력하세요: ')
-            if name == "":
-                break
-            price = int(input('지출 금액을 입력하세요: '))
+    if menu == "1":
+        filepath = select_file()
 
-            expense = [name, price]
+        if filepath is not None:
+            expenses = load_expenses(filepath)
+            manage_expenses(filepath, expenses)
 
-            expenses.append(expense)
+    elif menu == "2":   
+        filepath = create_file()   
+        expenses = []
 
-            #expenses.csv라는 파일을 연다.
-            with open("expenses.csv", "a", newline="", encoding="utf-8") as file:
-                #CSV 형식으로 파일에 쓰기 위한 도구를 만듦
-                writer = csv.writer(file)
-                #리스트 한 줄을 CSV에 점심,12000와 같은 형태로 저장
-                writer.writerow(expense)
+        manage_expenses(filepath, expenses)
 
-    elif menu == 2:
-        for expense in expenses:
-            print(expense[0],'=', expense[1], '원')
-
-    elif menu == 3:
-        total = 0 #for문으로 작성 안 하면 마지막 값만 계산됨
-        for expense in expenses:
-            total += expense[1]
-        print("총 지출 금액: ", total,"원")
-
-
-    elif menu == 4:
-        print("프로그램을 종료합니다.")
+    elif menu == "3":
+        print(" 프로그램을 종료합니다. ")
         break
 
+    else:
+        print(" 1, 2, 3 메뉴 중에서 선택하여 주세요. ")
 
-"""
-total = 0
-
-for expense in expenses:
-    print(expense[0],'=', expense[1], '원')
-    total += expense[1]
-    #print("총 지출 금액: ", total,"원") 이렇게 작성하면 지출 목록마다 계산된 총액 출력
-
-
-print("총 지출 금액: ", total,"원")
-"""
+    
