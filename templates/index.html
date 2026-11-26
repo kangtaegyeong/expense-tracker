@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Expense Tracker</h1>
+
+    <div class="card">
+        <h2>새 목록 만들기</h2>
+
+        <form action="/create-list" method="POST">
+
+            <input
+                type="text"
+                name="filename"
+                placeholder="예: 11월 생활비"
+                required
+            >
+
+            <button type="submit">
+                새 목록 만들기
+            </button>
+
+        </form>
+    </div>
+
+    <div class="card">
+       <h2>기존 목록 불러오기</h2>
+
+        {% for file in files %}
+
+        <div class="file-row">
+
+            <form action="/load-list" method="POST" class="file-load-form">
+
+                <input
+                    type="hidden"
+                    name="filename"
+                    value="{{ file }}"
+                >
+
+                <button
+                    type="submit"
+                    class="file-button"
+                >
+                    {{ file[:-4] }}
+                </button>
+
+            </form>
+
+
+            <form
+                action="/delete-list"
+                method="POST"
+                class="file-delete-form"
+                onsubmit="return confirm('이 목록을 삭제하시겠습니까?');"
+            >
+
+                <input
+                    type="hidden"
+                    name="filename"
+                    value="{{ file }}"
+                >
+
+                <button
+                    type="submit"
+                    class="file-delete-button"
+                >
+                    삭제
+                </button>
+
+            </form>
+
+        </div>
+
+        {% endfor %}
+    </div>
+
+</div>
+
+</body>
+</html>
